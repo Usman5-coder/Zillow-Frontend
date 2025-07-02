@@ -3,7 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Real Estate Deals Finder</title>
+    <title>Property Deal Analyzer</title>
+    <link
+      rel="shortcut icon"
+      href="favicon.jpg"
+      type="image/x-icon"
+      style="border-radius: 50%"
+    />
     <style>
       * {
         margin: 0;
@@ -12,173 +18,216 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          sans-serif;
-        background-color: #f8f9fa;
-        color: #333;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+        color: #e0e6ed;
+        min-height: 100vh;
         line-height: 1.6;
-        max-width: 100vh;
-        overflow-x: hidden;
-        position: relative;
       }
 
       .container {
-        position: absolute;
-        top: 0;
-        left: 120px;
-        max-width: 1400px;
-        margin: 0 0 5rem 0 !important;
+        max-width: 1200px;
+        margin: 0 auto;
         padding: 20px;
-        display: grid;
-        grid-template-columns: 300px 300px 1fr;
-        gap: 30px;
-        min-height: 100vh;
-        align-self: center;
       }
 
-      .panel {
-        background: white;
-        border-radius: 12px;
-        width: 300px;
-        padding: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        height: fit-content;
+      .section {
+        display: none;
+        animation: fadeIn 0.5s ease-in;
       }
 
-      .panel h2 {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: #1a1a1a;
+      .section.active {
+        display: block;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        background: linear-gradient(45deg, #4facfe, #00f2fe);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 30px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
       }
 
       .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
       }
 
-      label {
+      .form-group label {
         display: block;
         margin-bottom: 8px;
         font-weight: 500;
-        color: #555;
+        color: #b8c6db;
       }
 
-      input[type="text"],
-      input[type="number"] {
+      .form-control {
         width: 100%;
         padding: 12px 16px;
-        border: 2px solid #e1e5e9;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 8px;
-        font-size: 14px;
-        transition: border-color 0.2s ease;
+        color: #e0e6ed;
+        font-size: 16px;
+        transition: all 0.3s ease;
       }
 
-      input[type="text"]:focus,
-      input[type="number"]:focus {
+      .form-control:focus {
         outline: none;
-        border-color: #4285f4;
+        border-color: #4facfe;
+        box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2);
       }
 
       .btn {
-        width: 100%;
-        padding: 14px 20px;
+        background: linear-gradient(45deg, #4facfe, #00f2fe);
+        color: white;
         border: none;
+        padding: 14px 30px;
         border-radius: 8px;
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
 
-      .btn-primary {
-        background-color: #2c3e50;
-        color: white;
-      }
-
-      .btn-primary:hover:not(:disabled) {
-        background-color: #34495e;
-        transform: translateY(-1px);
-      }
-
-      .btn-secondary {
-        background-color: #4285f4;
-        color: white;
-      }
-
-      .btn-secondary:hover:not(:disabled) {
-        background-color: #3367d6;
-        transform: translateY(-1px);
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
       }
 
       .btn:disabled {
-        background-color: #94a3b8;
+        opacity: 0.6;
         cursor: not-allowed;
         transform: none;
       }
 
-      .slider-group {
+      .filters-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+        margin-top: 30px;
+      }
+
+      .dynamic-filters {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 30px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .filter-preview {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 30px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        height: fit-content;
+      }
+
+      .filter-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
         margin-bottom: 20px;
       }
 
       .slider-container {
-        position: relative;
-        margin: 15px 0;
+        margin-bottom: 25px;
       }
 
-      input[type="range"] {
+      .slider {
         width: 100%;
         height: 6px;
         border-radius: 3px;
-        background: #e1e5e9;
+        background: rgba(255, 255, 255, 0.2);
         outline: none;
         appearance: none;
         -webkit-appearance: none;
       }
 
-      input[type="range"]::-webkit-slider-thumb {
+      .slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        background: #4285f4;
+        background: linear-gradient(45deg, #4facfe, #00f2fe);
         cursor: pointer;
-        border: 2px solid white;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       }
 
-      input[type="range"]::-moz-range-thumb {
+      .slider::-moz-range-thumb {
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        background: #4285f4;
+        background: linear-gradient(45deg, #4facfe, #00f2fe);
         cursor: pointer;
-        border: 2px solid white;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        border: none;
       }
 
-      .slider-value {
-        font-size: 12px;
-        color: #666;
-        margin-top: 5px;
+      .preview-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .preview-item:last-child {
+        border-bottom: none;
+      }
+
+      .preview-label {
+        color: #b8c6db;
+      }
+
+      .preview-value {
+        color: #4facfe;
+        font-weight: 600;
       }
 
       .loading {
-        text-align: center;
-        padding: 20px;
-        color: #666;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
       }
 
-      .loading::after {
-        content: "";
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #f3f3f3;
-        border-top: 2px solid #4285f4;
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(79, 172, 254, 0.3);
+        border-top: 4px solid #4facfe;
         border-radius: 50%;
         animation: spin 1s linear infinite;
-        margin-left: 10px;
+        margin-bottom: 20px;
       }
 
       @keyframes spin {
@@ -190,456 +239,1104 @@
         }
       }
 
-      .comps-list {
-        background: #f8f9ff;
-        border-radius: 8px;
-        padding: 20px;
-        margin-top: 20px;
-        max-height: 600px;
-        overflow-y: scroll;
-      }
-
-      .comps-list h3 {
-        color: #4285f4;
-        margin-bottom: 15px;
-        font-size: 18px;
-      }
-
-      .comps-list ul {
-        list-style: none;
-        padding: 0;
-      }
-
-      .comps-list li {
-        background: white;
-        margin-bottom: 12px;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 4px solid #4285f4;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      }
-
-      .comps-list li strong {
-        color: #2c3e50;
-        display: block;
-        margin-bottom: 5px;
-      }
-
-      .comps-list li span {
-        color: #666;
-        font-size: 14px;
-      }
-
-      .filter-preview {
-        background: #f8f9ff;
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 20px;
-      }
-
-      .filter-preview h4 {
-        color: #4285f4;
-        margin-bottom: 12px;
-        font-size: 16px;
-      }
-
-      .filter-item {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        font-size: 14px;
-      }
-
-      .filter-item span:first-child {
-        color: #666;
-      }
-
-      .filter-item span:last-child {
-        color: #2c3e50;
-        font-weight: 500;
-      }
-
-      .results-section {
+      .results-container {
         margin-top: 30px;
       }
 
-      .profit-categories {
+      .results-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 20px;
         margin-top: 20px;
       }
 
-      .profit-card {
-        background: white;
-        border-radius: 12px;
+      .result-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
         padding: 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        border-top: 4px solid;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
 
-      .profit-card.low {
-        border-top-color: #e74c3c;
+      .property-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 25px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
       }
 
-      .profit-card.medium {
-        border-top-color: #27ae60;
+      .analysis-loading {
+        background: rgba(79, 172, 254, 0.1);
+        border: 1px solid rgba(79, 172, 254, 0.3);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+        text-align: center;
       }
 
-      .profit-card.high {
-        border-top-color: #f39c12;
+      .analysis-result {
+        background: rgba(0, 255, 0, 0.1);
+        border: 1px solid rgba(0, 255, 0, 0.3);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
       }
 
-      .profit-card h3 {
-        margin-bottom: 15px;
-        font-size: 18px;
+      .analysis-result h3 {
+        color: #4facfe;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
       }
 
-      .profit-card.low h3 {
-        color: #e74c3c;
+      .deal-highlight {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: #e0e6ed;
       }
 
-      .profit-card.medium h3 {
-        color: #27ae60;
+      .deal-highlight strong {
+        color: #00f2fe;
       }
 
-      .profit-card.high h3 {
-        color: #f39c12;
-      }
-
-      .property-item {
-        background: #f8f9fa;
+      .error {
+        background: rgba(255, 0, 0, 0.1);
+        border: 1px solid rgba(255, 0, 0, 0.3);
+        color: #ff6b6b;
         padding: 15px;
         border-radius: 8px;
-        margin-bottom: 12px;
-        border-left: 3px solid currentColor;
+        margin: 20px 0;
       }
 
-      .property-address {
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: #2c3e50;
-      }
-
-      .property-details {
-        font-size: 14px;
-        color: #666;
-        line-height: 1.4;
-      }
-
-      .error-message {
-        background: #fee;
-        color: #c33;
+      .success {
+        background: rgba(0, 255, 0, 0.1);
+        border: 1px solid rgba(0, 255, 0, 0.3);
+        color: #51cf66;
         padding: 15px;
         border-radius: 8px;
-        margin: 15px 0;
-        border: 1px solid #fcc;
+        margin: 20px 0;
       }
-      #comps-required {
-        display: none !important;
-        width: 0;
-        height: 0;
-      }
-      .comps-li{
-        overflow-x: scroll;
-      }
-      @media (max-width: 1200px) {
-        .container {
+
+      @media (max-width: 768px) {
+        .filters-container {
           grid-template-columns: 1fr;
-          gap: 20px;
+        }
+
+        .filter-row {
+          grid-template-columns: 1fr;
+        }
+
+        .header h1 {
+          font-size: 2rem;
         }
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <!-- Search City Panel -->
-      <div class="panel">
-        <h2>Search City for Deals</h2>
-        <div class="form-group">
-          <label for="cityInput">City</label>
-          <input type="text" id="cityInput" placeholder="e.g. Durham, NC" />
+      <!-- Initial Search Section -->
+      <div id="searchSection" class="section active">
+        <div class="header">
+          <h1>Property Deal Analyzer</h1>
+          <p>Find profitable real estate deals with advanced filtering</p>
         </div>
-        <button class="btn btn-primary" onclick="scanCityForDeals()">
-          Scan City for Deals
-        </button>
 
-        <div id="compsResults"></div>
+        <div class="card">
+          <h2 style="margin-bottom: 25px; color: #4facfe">Property Search</h2>
+          <form id="searchForm">
+            <div class="form-group">
+              <label for="city">City</label>
+              <input
+                type="text"
+                id="city"
+                class="form-control"
+                placeholder="e.g., Miami, FL"
+                required
+              />
+            </div>
+
+            <div class="filter-row">
+              <div class="form-group">
+                <label for="minPrice">Min Price ($)</label>
+                <input
+                  type="number"
+                  id="minPrice"
+                  class="form-control"
+                  placeholder="300000"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="maxPrice">Max Price ($)</label>
+                <input
+                  type="number"
+                  id="maxPrice"
+                  class="form-control"
+                  placeholder="800000"
+                  required
+                />
+              </div>
+            </div>
+
+            <button type="submit" class="btn">Search Properties</button>
+          </form>
+        </div>
       </div>
 
-      <!-- Dynamic Deal Filters Panel -->
-      <div class="panel">
-        <h2>Dynamic Deal Filters</h2>
+      <!-- Loading Section -->
+      <div id="loadingSection" class="section">
+        <div class="card">
+          <div class="loading">
+            <div class="spinner"></div>
+            <h3>Searching Properties...</h3>
+            <p id="loadingMessage">Getting subject property data...</p>
+          </div>
+        </div>
+      </div>
 
-        <div class="form-group">
-          <label for="maxArv">Max ARV ($)</label>
-          <input
-            type="number"
-            id="maxArv"
-            value="400000"
-            oninput="updateFilters()"
-          />
+      <!-- Filters Section -->
+      <div id="filtersSection" class="section">
+        <div class="header">
+          <h2>Dynamic Deal Filters</h2>
+          <p>Customize your investment criteria</p>
         </div>
 
-        <div class="form-group">
-          <label for="repairCost">Repair Cost ($)</label>
-          <input
-            type="number"
-            id="repairCost"
-            value="40000"
-            oninput="updateFilters()"
-          />
-        </div>
+        <div class="filters-container">
+          <div class="dynamic-filters">
+            <h3 style="margin-bottom: 25px; color: #4facfe">
+              Dynamic Deal Filters
+            </h3>
 
-        <div class="form-group">
-          <label for="minProfit">Min Profit ($)</label>
-          <input
-            type="number"
-            id="minProfit"
-            value="20000"
-            oninput="updateFilters()"
-          />
-        </div>
+            <div class="form-group">
+              <label for="maxArv">Max ARV ($)</label>
+              <input
+                type="number"
+                id="maxArv"
+                class="form-control"
+                value="400000"
+              />
+            </div>
 
-        <div class="form-group">
-          <label for="sqftBuffer">SqFt Buffer (±)</label>
-          <input
-            type="number"
-            id="sqftBuffer"
-            value="500"
-            oninput="updateFilters()"
-          />
-        </div>
+            <div class="form-group">
+              <label for="repairCost">Repair Cost ($)</label>
+              <input
+                type="number"
+                id="repairCost"
+                class="form-control"
+                value="40000"
+              />
+            </div>
 
-        <div class="slider-group">
-          <label>Comps Radius (miles)</label>
-          <div class="slider-container">
-            <input
-              type="range"
-              id="compsRadius"
-              min="2"
-              max="20"
-              step="2"
-              value="2"
-              oninput="updateFilters()"
-            />
-            <div class="slider-value">
-              Selected: <span id="radiusValue">0.25</span> miles
+            <div class="form-group">
+              <label for="minProfit">Min Profit ($)</label>
+              <input
+                type="number"
+                id="minProfit"
+                class="form-control"
+                value="20000"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="sqftBuffer">SqFt Buffer (±)</label>
+              <input
+                type="number"
+                id="sqftBuffer"
+                class="form-control"
+                value="500"
+              />
+            </div>
+
+            <div class="slider-container">
+              <label for="compsRadius">Comps Radius (miles)</label>
+              <input
+                type="range"
+                id="compsRadius"
+                class="slider"
+                min="0.5"
+                max="10"
+                step="0.5"
+                value="2"
+              />
+              <div style="margin-top: 8px; color: #b8c6db">
+                Selected: <span id="radiusValue">2</span> miles
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="noOfComps">Number of Comps</label>
+              <input
+                type="number"
+                id="noOfComps"
+                class="form-control"
+                value="10"
+                min="1"
+                max="50"
+              />
+            </div>
+
+            <button type="button" id="applyFilters" class="btn">
+              Apply Filters
+            </button>
+          </div>
+
+          <div class="filter-preview">
+            <h3 style="margin-bottom: 25px; color: #4facfe">
+              Current Filter Preview
+            </h3>
+            <div style="margin-bottom: 20px; color: #00f2fe; font-weight: 600">
+              Current Settings
+            </div>
+
+            <div class="preview-item">
+              <span class="preview-label">Max ARV:</span>
+              <span class="preview-value" id="previewMaxArv">$400000</span>
+            </div>
+
+            <div class="preview-item">
+              <span class="preview-label">Repair Cost:</span>
+              <span class="preview-value" id="previewRepairCost">$40000</span>
+            </div>
+
+            <div class="preview-item">
+              <span class="preview-label">Min Profit:</span>
+              <span class="preview-value" id="previewMinProfit">$20000</span>
+            </div>
+
+            <div class="preview-item">
+              <span class="preview-label">Comps Radius:</span>
+              <span class="preview-value" id="previewCompsRadius">2 miles</span>
+            </div>
+
+            <div class="preview-item">
+              <span class="preview-label">SqFt Buffer:</span>
+              <span class="preview-value" id="previewSqftBuffer"
+                >±500 sq ft</span
+              >
+            </div>
+
+            <div class="preview-item">
+              <span class="preview-label">Number of Comps:</span>
+              <span class="preview-value" id="previewNoOfComps">10</span>
             </div>
           </div>
         </div>
-
-        <button
-          class="btn btn-secondary"
-          id="applyFilters"
-          onclick="applyFilters()"
-          disabled
-        >
-          Apply Filters
-        </button>
       </div>
 
-      <!-- Current Filter Preview Panel -->
-      <div class="panel">
-        <h2>Current Filter Preview</h2>
-        <div class="filter-preview">
-          <h4>Current Settings</h4>
-          <div class="filter-item">
-            <span>Max ARV:</span>
-            <span id="previewMaxArv">$400000</span>
-          </div>
-          <div class="filter-item">
-            <span>Repair Cost:</span>
-            <span id="previewRepairCost">$40000</span>
-          </div>
-          <div class="filter-item">
-            <span>Min Profit:</span>
-            <span id="previewMinProfit">$20000</span>
-          </div>
-          <div class="filter-item">
-            <span>Comps Radius:</span>
-            <span id="previewCompsRadius">0.25 miles</span>
-          </div>
-          <div class="filter-item">
-            <span>SqFt Buffer:</span>
-            <span id="previewSqftBuffer">±500 sq ft</span>
+      <!-- Processing Section -->
+      <div id="processingSection" class="section">
+        <div class="card">
+          <div class="loading">
+            <div class="spinner"></div>
+            <h3>Processing Analysis...</h3>
+            <p id="processingStatus">Fetching comparable properties...</p>
           </div>
         </div>
+      </div>
 
-        <!-- Results Section -->
-        <div class="results-section">
-          <div id="resultsContainer" style="overflow-x: scroll;"></div>
+      <!-- Results Section -->
+      <div id="resultsSection" class="section">
+        <div class="header">
+          <h2>Analysis Results</h2>
+          <p>Your property deal analysis is complete</p>
+        </div>
+
+        <!-- Analysis Loading Animation -->
+        <div
+          id="analysisLoading"
+          class="analysis-loading"
+          style="display: none"
+        >
+          <div class="spinner" style="margin: 0 auto 15px auto"></div>
+          <h3 id="analysisMessage">Analyzing property...</h3>
+        </div>
+
+        <!-- Analysis Results -->
+        <div id="analysisResult" style="display: none"></div>
+
+        <!-- Subject Property -->
+        <div id="subjectPropertyContainer" style="display: none">
+          <h3 style="color: #4facfe; margin-bottom: 20px">Subject Property</h3>
+          <div id="subjectPropertyCard" class="property-card"></div>
+        </div>
+
+        <!-- Comparable Properties -->
+        <div id="compsContainer" style="display: none">
+          <h3 style="color: #4facfe; margin-bottom: 20px">
+            Comparable Properties
+          </h3>
+          <div id="compsGrid" class="results-grid"></div>
+        </div>
+
+        <div style="margin-top: 20px; text-align: center">
+          <button type="button" id="newSearch" class="btn">New Search</button>
         </div>
       </div>
     </div>
 
-    <script>
-      let currentCity = "";
-      let filtersChanged = false;
+   <script>
+      // Global variables to store data as requested
+      let initialFilters = {
+        city: "",
+        minPrice: 0,
+        maxPrice: 0,
+      };
+      let subjectProperty = null;
+      let compsData = null;
 
-      function formatCityName(cityInput) {
-        // Remove state abbreviation and convert to lowercase with hyphens
-        const city = cityInput.split(",")[0].trim();
-        return city.toLowerCase().replace(/\s+/g, "-");
-      }
+      // Webhook URLs
+      const INITIAL_WEBHOOK_URL =
+        "https://gelim.app.n8n.cloud/webhook/c9ab65e9-3dd2-45be-91b9-baeef2e0ab68";
+      const COMPS_WEBHOOK_URL =
+        "https://gelim.app.n8n.cloud/webhook/95f274c1-f3a4-41df-974a-65afcd724976";
+      const FINAL_ANALYSIS_URL =
+        "https://gelim.app.n8n.cloud/webhook/aab3031d-bd11-4f24-8b85-2b306330f934";
 
-      async function scanCityForDeals() {
-        const cityInput = document.getElementById("cityInput").value.trim();
+      // Analysis messages for loading animation
+      const analysisMessages = [
+        "Analyzing property...",
+        "Calculating ARV...",
+        "Calculating Ideal Purchase price...",
+        "Finalizing the profit...",
+        "Getting near the results...",
+        "Comparing market trends...",
+        "Evaluating investment potential...",
+        "Processing final calculations...",
+      ];
 
-        if (!cityInput) {
-          alert("Please enter a city name");
-          return;
-        }
+      let messageIndex = 0;
+      let analysisInterval = null;
 
-        currentCity = formatCityName(cityInput);
-        const compsResults = document.getElementById("compsResults");
+      // DOM elements
+      const sections = {
+        search: document.getElementById("searchSection"),
+        loading: document.getElementById("loadingSection"),
+        filters: document.getElementById("filtersSection"),
+        processing: document.getElementById("processingSection"),
+        results: document.getElementById("resultsSection"),
+      };
 
-        compsResults.innerHTML =
-          '<div class="loading">Scanning city for deals...</div>';
+      // Initialize event listeners
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeEventListeners();
+        updateFilterPreview();
+      });
 
-        try {
-          const response = await fetch(
-            "https://gelim.app.n8n.cloud/webhook/b3fc0466-c1f7-4b3f-8300-d86918f0fc12",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                city: currentCity,
-                action: "scan_city"
-              }),
-            }
-          );
+      function initializeEventListeners() {
+        // Search form
+        document
+          .getElementById("searchForm")
+          .addEventListener("submit", handleInitialSearch);
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
+        // Filter inputs
+        document
+          .getElementById("maxArv")
+          .addEventListener("input", updateFilterPreview);
+        document
+          .getElementById("repairCost")
+          .addEventListener("input", updateFilterPreview);
+        document
+          .getElementById("minProfit")
+          .addEventListener("input", updateFilterPreview);
+        document
+          .getElementById("sqftBuffer")
+          .addEventListener("input", updateFilterPreview);
+        document
+          .getElementById("noOfComps")
+          .addEventListener("input", updateFilterPreview);
 
-          const data = await response.json();
-          displayComps(data);
-
-          // Enable apply filters button since we have comps data
-          filtersChanged = true;
-          updateFilterButtonState();
-        } catch (error) {
-          console.error("Error scanning city:", error);
-          compsResults.innerHTML =
-            '<div class="error-message">Error scanning city. Please try again.</div>';
-        }
-      }
-
-      function displayComps(data) {
-        const compsResults = document.getElementById("compsResults");
-
-        if (data.length > 0) {
-          let html = '<div class="comps-list"><h3>Found Comps</h3><ul>';
-
-          data.forEach((comp) => {
-            html += `
-                        <li class="comps-li">
-                            <strong>${comp}</strong>
-                        </li>
-                    `;
+        // Comps radius slider
+        document
+          .getElementById("compsRadius")
+          .addEventListener("input", function () {
+            document.getElementById("radiusValue").textContent = this.value;
+            updateFilterPreview();
           });
 
-          html += "</ul></div>";
-          compsResults.innerHTML = html;
-        } else {
-          compsResults.innerHTML =
-            '<div class="error-message">No comps found for this city.</div>';
-        }
+        // Apply filters button
+        document
+          .getElementById("applyFilters")
+          .addEventListener("click", handleApplyFilters);
+
+        // New search button
+        document
+          .getElementById("newSearch")
+          .addEventListener("click", resetToSearch);
       }
 
-      function updateFilters() {
-        // Update preview values
+      function showSection(sectionName) {
+        Object.values(sections).forEach((section) =>
+          section.classList.remove("active")
+        );
+        sections[sectionName].classList.add("active");
+      }
+
+      function updateFilterPreview() {
         document.getElementById("previewMaxArv").textContent =
-          "$" + document.getElementById("maxArv").value;
+          "$" + formatNumber(document.getElementById("maxArv").value);
         document.getElementById("previewRepairCost").textContent =
-          "$" + document.getElementById("repairCost").value;
+          "$" + formatNumber(document.getElementById("repairCost").value);
         document.getElementById("previewMinProfit").textContent =
-          "$" + document.getElementById("minProfit").value;
+          "$" + formatNumber(document.getElementById("minProfit").value);
         document.getElementById("previewCompsRadius").textContent =
           document.getElementById("compsRadius").value + " miles";
         document.getElementById("previewSqftBuffer").textContent =
           "±" + document.getElementById("sqftBuffer").value + " sq ft";
-
-        // Update slider display values
-        document.getElementById("radiusValue").textContent =
-          document.getElementById("compsRadius").value;
-
-        filtersChanged = true;
-        updateFilterButtonState();
+        document.getElementById("previewNoOfComps").textContent =
+          document.getElementById("noOfComps").value;
       }
 
-      function updateFilterButtonState() {
-        const applyButton = document.getElementById("applyFilters");
-        const allFieldsFilled =
-          document.getElementById("maxArv").value &&
-          document.getElementById("repairCost").value &&
-          document.getElementById("minProfit").value &&
-          document.getElementById("sqftBuffer").value &&
-          currentCity &&
-          filtersChanged;
-
-        applyButton.disabled = !allFieldsFilled;
+      function formatNumber(num) {
+        return parseInt(num).toLocaleString();
       }
 
-      async function applyFilters() {
-        const resultsContainer = document.getElementById("resultsContainer");
-        resultsContainer.innerHTML =
-          '<div class="loading">Applying filters and searching deals...</div>';
+      async function handleInitialSearch(e) {
+        e.preventDefault();
 
-        const filterData = {
-          city: currentCity,
-          maxArv: parseInt(document.getElementById("maxArv").value),
-          repairCost: parseInt(document.getElementById("repairCost").value),
-          minProfit: parseInt(document.getElementById("minProfit").value),
-          sqftBuffer: parseInt(document.getElementById("sqftBuffer").value),
-          compsRadius: parseFloat(document.getElementById("compsRadius").value),
-          action: "apply_filters",
+        const city = document.getElementById("city").value.trim();
+        const minPrice = document.getElementById("minPrice").value;
+        const maxPrice = document.getElementById("maxPrice").value;
+
+        if (!city || !minPrice || !maxPrice) {
+          showError("Please fill in all required fields");
+          return;
+        }
+
+        // Store initial filters as requested (Point 1)
+        initialFilters = {
+          city: city,
+          minPrice: parseInt(minPrice),
+          maxPrice: parseInt(maxPrice),
         };
 
+        console.log("Initial filters saved:", initialFilters);
+
+        const searchParams = {
+          city: city,
+          min_price: parseInt(minPrice),
+          max_price: parseInt(maxPrice),
+          property_type: "for_sale",
+          step: "subject_property",
+        };
+
+        showSection("loading");
+        document.getElementById("loadingMessage").textContent =
+          "Getting subject property data...";
+
         try {
-          const response = await fetch(
-            "https://gelim.app.n8n.cloud/webhook/f8d61182-1a01-49f9-83db-5a29d9a94bec",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(filterData),
-            }
-          );
+          const response = await fetch(INITIAL_WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(searchParams),
+          });
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
-          const data = await response.json();
-          displayFilteredResults(data);
+          // Store subject property as requested (Point 2)
+          subjectProperty = await response.json();
+          console.log("Subject property saved:", subjectProperty);
+
+          showSection("filters");
         } catch (error) {
-          console.error("Error applying filters:", error);
-          resultsContainer.innerHTML =
-            '<div class="error-message">Error applying filters. Please try again.</div>';
+          console.error("Error in initial search:", error);
+          showError(
+            "Failed to search properties. Please check your connection and try again."
+          );
+          showSection("search");
         }
       }
 
-      function displayFilteredResults(data) {
-        const resultsContainer = document.getElementById("resultsContainer");
+      async function handleApplyFilters() {
+        showSection("processing");
+        updateProcessingStatus("Fetching comparable properties...");
 
-        // Assuming the response contains HTML content for the profit categories
-        if (data) {
-          resultsContainer.innerHTML = JSON.stringify(data);
+        try {
+          const filterData = {
+            subject_property: subjectProperty,
+            // Include initial filters in the comps request
+            city: initialFilters.city,
+            min_price: initialFilters.minPrice,
+            max_price: initialFilters.maxPrice,
+            filters: {
+              max_arv: parseInt(document.getElementById("maxArv").value),
+              repair_cost: parseInt(
+                document.getElementById("repairCost").value
+              ),
+              min_profit: parseInt(document.getElementById("minProfit").value),
+              sqft_buffer: parseInt(
+                document.getElementById("sqftBuffer").value
+              ),
+              comps_radius: parseFloat(
+                document.getElementById("compsRadius").value
+              ),
+              no_of_comps: parseInt(document.getElementById("noOfComps").value),
+              property_type: "sold",
+            },
+            step: "comparable_properties",
+          };
+
+          const response = await fetch(COMPS_WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(filterData),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          // Store comps data as requested (Point 2)
+          compsData = await response.json();
+          console.log("Comps data saved:", compsData);
+
+          // Show results section with properties (Point 2)
+          showSection("results");
+          displayProperties();
+
+          // Start analysis loading animation
+          startAnalysisAnimation();
+
+          // Send data for final analysis as requested (Point 3)
+          const finalAnalysisData = {
+            subject_property: subjectProperty,
+            initial_filters: initialFilters, // Including stored initial filters
+            comparable_properties: compsData,
+            filters: filterData.filters,
+            step: "final_analysis",
+          };
+
+          console.log("Sending final analysis data:", finalAnalysisData);
+
+          const analysisResponse = await fetch(FINAL_ANALYSIS_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(finalAnalysisData),
+          });
+
+          if (!analysisResponse.ok) {
+            throw new Error(
+              `Analysis error! status: ${analysisResponse.status}`
+            );
+          }
+
+          const analysisResults = await analysisResponse.json();
+          console.log("Analysis results received:", analysisResults);
+
+          stopAnalysisAnimation();
+          // Display output as requested (Point 4)
+          displayAnalysisResults(analysisResults);
+        } catch (error) {
+          console.error("Error in filter processing:", error);
+          stopAnalysisAnimation();
+          showError(
+            "Failed to process filters and analyze properties. Please try again."
+          );
+          showSection("filters");
+        }
+      }
+
+      function startAnalysisAnimation() {
+        document.getElementById("analysisLoading").style.display = "block";
+        messageIndex = 0;
+
+        // Update message immediately
+        document.getElementById("analysisMessage").textContent =
+          analysisMessages[messageIndex];
+
+        // Set interval to cycle through messages
+        analysisInterval = setInterval(() => {
+          messageIndex = (messageIndex + 1) % analysisMessages.length;
+          document.getElementById("analysisMessage").textContent =
+            analysisMessages[messageIndex];
+        }, 2000); // Change message every 2 seconds
+      }
+
+      function stopAnalysisAnimation() {
+        if (analysisInterval) {
+          clearInterval(analysisInterval);
+          analysisInterval = null;
+        }
+        document.getElementById("analysisLoading").style.display = "none";
+      }
+
+      function displayProperties() {
+        // Display subject property
+        if (subjectProperty) {
+          document.getElementById("subjectPropertyContainer").style.display =
+            "none";
+          document.getElementById("subjectPropertyCard").innerHTML =
+            createPropertyCard(subjectProperty, true);
+        }
+
+        // Display comparable properties as requested (Point 2)
+        if (compsData && Array.isArray(compsData) && compsData.length > 0) {
+          document.getElementById("compsContainer").style.display = "block";
+          const compsGrid = document.getElementById("compsGrid");
+          compsGrid.innerHTML = "";
+
+          compsData.forEach((comp, index) => {
+            const compCard = document.createElement("div");
+            compCard.className = "result-card";
+            compCard.innerHTML = createPropertyCard(comp, false);
+            compsGrid.appendChild(compCard);
+          });
+
+          console.log(`Displayed ${compsData.length} comparable properties`);
         } else {
-          // Fallback: create structure from JSON data
-          let html = '<div class="profit-categories"> <p>Nothing find Out</p>';
-           
-          html += "</div>";
-          resultsContainer.innerHTML = html;
+          console.log("No comparable properties to display");
         }
       }
-      updateFilters();
+
+      function createPropertyCard(property, isSubject = false) {
+        const cardTitle = isSubject
+          ? "🏠 Subject Property"
+          : "🏘️ Comparable Property";
+        const price = property.Price || "N/A"
+        const beds = property.bed || "N/A";
+        const baths = property.baths || "N/A";
+        const sqft = property['Area(sqft)']
+          ? `${formatNumber(property['Area(sqft)'])} sq ft`
+          : "N/A";
+        const address = property.property_address || "Address not available";
+        const propertyType = property.property_type || "Address not available";
+        const url = property.details_url || "#";
+
+        return `
+                <h4 style="color: #4facfe; margin-bottom: 15px;">${cardTitle}</h4>
+                <div style="color: #e0e6ed; line-height: 1.8;">
+                    <div style="margin-bottom: 10px;"><strong>💵 Price:</strong> ${price}</div>
+                    <div style="margin-bottom: 10px;"><strong>🛏️ Beds:</strong> ${beds}</div>
+                    <div style="margin-bottom: 10px;"><strong>🛁 Baths:</strong> ${baths}</div>
+                    <div style="margin-bottom: 10px;"><strong>📐 Area:</strong> ${sqft}</div>
+                    <div style="margin-bottom: 10px;"><strong>🏠 Address:</strong> ${address}</div>
+                    <div style="margin-bottom: 10px;"><strong>🏠 Property Type:</strong> ${propertyType}</div>
+                    ${
+                      url !== "#"
+                        ? `<div><strong>🔗 URL:</strong> <a href="${url}" target="_blank" style="color: #4facfe;">View Property</a></div>`
+                        : ""
+                    }
+                </div>
+            `;
+      }
+
+      function displayAnalysisResults(results) {
+        const analysisResult = document.getElementById("analysisResult");
+
+        if (!results || !results.output) {
+          analysisResult.innerHTML =
+            '<div class="error">No analysis results received. Please try again.</div>';
+          analysisResult.style.display = "block";
+          return;
+        }
+
+        // Display the output as requested (Point 4)
+        analysisResult.innerHTML = `
+                <div class="analysis-result">
+                    <h3>🎯 Deal Analysis Results</h3>
+                    <div class="deal-highlight">
+                        ${results.output}
+                    </div>
+                </div>
+            `;
+
+        analysisResult.style.display = "block";
+        console.log("Analysis results displayed successfully");
+      }
+
+      function updateProcessingStatus(status) {
+        document.getElementById("processingStatus").textContent = status;
+      }
+
+      function showError(message) {
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "error";
+        errorDiv.textContent = message;
+
+        // Insert error message in current section
+        const activeSection = document.querySelector(".section.active .card");
+        if (activeSection) {
+          activeSection.insertBefore(errorDiv, activeSection.firstChild);
+
+          // Remove error after 5 seconds
+          setTimeout(() => {
+            if (errorDiv.parentNode) {
+              errorDiv.parentNode.removeChild(errorDiv);
+            }
+          }, 5000);
+        }
+      }
+
+      function showSuccess(message) {
+        const successDiv = document.createElement("div");
+        successDiv.className = "success";
+        successDiv.textContent = message;
+
+        // Insert success message in current section
+        const activeSection = document.querySelector(".section.active .card");
+        if (activeSection) {
+          activeSection.insertBefore(successDiv, activeSection.firstChild);
+
+          // Remove success message after 3 seconds
+          setTimeout(() => {
+            if (successDiv.parentNode) {
+              successDiv.parentNode.removeChild(successDiv);
+            }
+          }, 3000);
+        }
+      }
+
+      function resetToSearch() {
+        // Clear all stored data
+        initialFilters = {
+          city: "",
+          minPrice: 0,
+          maxPrice: 0,
+        };
+        subjectProperty = null;
+        compsData = null;
+
+        // Clear form inputs
+        document.getElementById("city").value = "";
+        document.getElementById("minPrice").value = "";
+        document.getElementById("maxPrice").value = "";
+
+        // Reset filter inputs to defaults
+        document.getElementById("maxArv").value = "400000";
+        document.getElementById("repairCost").value = "40000";
+        document.getElementById("minProfit").value = "20000";
+        document.getElementById("sqftBuffer").value = "500";
+        document.getElementById("compsRadius").value = "2";
+        document.getElementById("noOfComps").value = "10";
+        document.getElementById("radiusValue").textContent = "2";
+
+        // Update filter preview
+        updateFilterPreview();
+
+        // Hide all result containers
+        document.getElementById("subjectPropertyContainer").style.display =
+          "none";
+        document.getElementById("compsContainer").style.display = "none";
+        document.getElementById("analysisResult").style.display = "none";
+
+        // Stop any running analysis animation
+        stopAnalysisAnimation();
+
+        // Clear any existing error/success messages
+        const existingMessages = document.querySelectorAll(".error, .success");
+        existingMessages.forEach((msg) => {
+          if (msg.parentNode) {
+            msg.parentNode.removeChild(msg);
+          }
+        });
+
+        // Show search section
+        showSection("search");
+
+        console.log("Application reset to initial state");
+      }
+
+      // Utility function to validate form inputs
+      function validateSearchForm() {
+        const city = document.getElementById("city").value.trim();
+        const minPrice = document.getElementById("minPrice").value;
+        const maxPrice = document.getElementById("maxPrice").value;
+
+        if (!city) {
+          showError("Please enter a city name");
+          return false;
+        }
+
+        if (!minPrice || isNaN(minPrice) || parseInt(minPrice) <= 0) {
+          showError("Please enter a valid minimum price");
+          return false;
+        }
+
+        if (!maxPrice || isNaN(maxPrice) || parseInt(maxPrice) <= 0) {
+          showError("Please enter a valid maximum price");
+          return false;
+        }
+
+        if (parseInt(minPrice) >= parseInt(maxPrice)) {
+          showError("Maximum price must be greater than minimum price");
+          return false;
+        }
+
+        return true;
+      }
+
+      // Utility function to validate filter inputs
+      function validateFilters() {
+        const maxArv = document.getElementById("maxArv").value;
+        const repairCost = document.getElementById("repairCost").value;
+        const minProfit = document.getElementById("minProfit").value;
+        const sqftBuffer = document.getElementById("sqftBuffer").value;
+        const noOfComps = document.getElementById("noOfComps").value;
+
+        if (!maxArv || isNaN(maxArv) || parseInt(maxArv) <= 0) {
+          showError("Please enter a valid Max ARV");
+          return false;
+        }
+
+        if (!repairCost || isNaN(repairCost) || parseInt(repairCost) < 0) {
+          showError("Please enter a valid repair cost");
+          return false;
+        }
+
+        if (!minProfit || isNaN(minProfit) || parseInt(minProfit) <= 0) {
+          showError("Please enter a valid minimum profit");
+          return false;
+        }
+
+        if (!sqftBuffer || isNaN(sqftBuffer) || parseInt(sqftBuffer) < 0) {
+          showError("Please enter a valid square footage buffer");
+          return false;
+        }
+
+        if (
+          !noOfComps ||
+          isNaN(noOfComps) ||
+          parseInt(noOfComps) <= 0 ||
+          parseInt(noOfComps) > 50
+        ) {
+          showError("Please enter a valid number of comps (1-50)");
+          return false;
+        }
+
+        return true;
+      }
+
+      // Enhanced error handling for API calls
+      async function makeAPICall(url, data, operation) {
+        try {
+          console.log(`Making API call for ${operation}:`, data);
+
+          const response = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`API Error (${response.status}):`, errorText);
+            throw new Error(`Server returned ${response.status}: ${errorText}`);
+          }
+
+          const result = await response.json();
+          console.log(`API Response for ${operation}:`, result);
+          return result;
+        } catch (error) {
+          console.error(`Error in ${operation}:`, error);
+
+          if (error.name === "TypeError" && error.message.includes("fetch")) {
+            throw new Error(
+              "Network error - please check your internet connection"
+            );
+          } else if (error.message.includes("JSON")) {
+            throw new Error("Invalid response from server");
+          } else {
+            throw error;
+          }
+        }
+      }
+
+      // Enhanced initial search with validation
+      async function handleInitialSearch(e) {
+        e.preventDefault();
+
+        if (!validateSearchForm()) {
+          return;
+        }
+
+        const city = document.getElementById("city").value.trim();
+        const minPrice = document.getElementById("minPrice").value;
+        const maxPrice = document.getElementById("maxPrice").value;
+
+        // Store initial filters as requested (Point 1)
+        initialFilters = {
+          city: city,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+        };
+
+        console.log("Initial filters saved:", initialFilters);
+
+        const searchParams = {
+          city: city,
+          min_price: minPrice,
+          max_price: maxPrice,
+          property_type: "for_sale",
+          step: "subject_property",
+        };
+
+        showSection("loading");
+        document.getElementById("loadingMessage").textContent =
+          "Getting subject property data...";
+
+        try {
+          subjectProperty = await makeAPICall(
+            INITIAL_WEBHOOK_URL,
+            searchParams,
+            "initial search"
+          );
+          console.log("Subject property saved:", subjectProperty);
+
+          showSuccess("Subject property found successfully!");
+          setTimeout(() => showSection("filters"), 1000);
+        } catch (error) {
+          showError(`Failed to search properties: ${error.message}`);
+          setTimeout(() => showSection("search"), 2000);
+        }
+      }
+
+      // Enhanced filter application with validation
+      async function handleApplyFilters() {
+        if (!validateFilters()) {
+          return;
+        }
+
+        if (!subjectProperty) {
+          showError("No subject property found. Please start a new search.");
+          return;
+        }
+
+        showSection("processing");
+        updateProcessingStatus("Fetching comparable properties...");
+
+        try {
+          const filterData = {
+            subject_property: subjectProperty,
+            // Include initial filters in the comps request
+            city: initialFilters.city,
+            min_price: initialFilters.minPrice,
+            max_price: initialFilters.maxPrice,
+            filters: {
+              max_arv: parseInt(document.getElementById("maxArv").value),
+              repair_cost: parseInt(
+                document.getElementById("repairCost").value
+              ),
+              min_profit: parseInt(document.getElementById("minProfit").value),
+              sqft_buffer: parseInt(
+                document.getElementById("sqftBuffer").value
+              ),
+              comps_radius: parseFloat(
+                document.getElementById("compsRadius").value
+              ),
+              no_of_comps: parseInt(document.getElementById("noOfComps").value),
+            },
+            step: "comparable_properties",
+          };
+
+          updateProcessingStatus("Analyzing comparable properties...");
+          compsData = await makeAPICall(
+            COMPS_WEBHOOK_URL,
+            filterData,
+            "comparable properties"
+          );
+          console.log("Comps data saved:", compsData);
+
+          // Show results section with properties (Point 2)
+          showSection("results");
+          displayProperties();
+
+          // Start analysis loading animation
+          startAnalysisAnimation();
+
+          // Send data for final analysis as requested (Point 3)
+          const finalAnalysisData = {
+            subject_property: subjectProperty,
+            initial_filters: initialFilters,
+            comparable_properties: compsData,
+            filters: filterData.filters,
+            step: "final_analysis",
+          };
+
+          console.log("Sending final analysis data:", finalAnalysisData);
+
+          const analysisResults = await makeAPICall(
+            FINAL_ANALYSIS_URL,
+            finalAnalysisData,
+            "final analysis"
+          );
+          console.log("Analysis results received:", analysisResults);
+
+          stopAnalysisAnimation();
+          displayAnalysisResults(analysisResults);
+        } catch (error) {
+          stopAnalysisAnimation();
+          showError(`Analysis failed: ${error.message}`);
+          setTimeout(() => showSection("filters"), 3000);
+        }
+      }
+
+      // Add keyboard shortcuts for better UX
+      document.addEventListener("keydown", function (e) {
+        // Enter key on search form
+        if (
+          e.key === "Enter" &&
+          document.getElementById("searchSection").classList.contains("active")
+        ) {
+          const form = document.getElementById("searchForm");
+          if (form.checkValidity()) {
+            handleInitialSearch(e);
+          }
+        }
+
+        // Escape key to go back to search
+        if (e.key === "Escape") {
+          resetToSearch();
+        }
+      });
+
+      // // Add input formatting for better UX
+      // function formatCurrencyInput(input) {
+      //     input.addEventListener('input', function() {
+      //         let value = this.value.replace(/\D/g, '');
+      //         if (value) {
+      //             this.value = parseInt(value).toLocaleString();
+      //         }
+      //     });
+
+      //     input.addEventListener('blur', function() {
+      //         let value = this.value.replace(/,/g, '');
+      //         if (value && !isNaN(value)) {
+      //             this.value = value;
+      //         }
+      //     });
+      // }
+
+      // // Initialize currency formatting on price inputs
+      // document.addEventListener('DOMContentLoaded', function() {
+      //     formatCurrencyInput(document.getElementById('minPrice'));
+      //     formatCurrencyInput(document.getElementById('maxPrice'));
+      //     formatCurrencyInput(document.getElementById('maxArv'));
+      //     formatCurrencyInput(document.getElementById('repairCost'));
+      //     formatCurrencyInput(document.getElementById('minProfit'));
+      // });
+
+      // Add window beforeunload warning if analysis is in progress
+      window.addEventListener("beforeunload", function (e) {
+        if (analysisInterval) {
+          e.preventDefault();
+          e.returnValue =
+            "Analysis is in progress. Are you sure you want to leave?";
+          return e.returnValue;
+        }
+      });
+
+      console.log("Property Deal Analyzer initialized successfully");
     </script>
   </body>
 </html>
