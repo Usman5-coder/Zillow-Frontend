@@ -858,7 +858,7 @@
           messageIndex = (messageIndex + 1) % analysisMessages.length;
           document.getElementById("analysisMessage").textContent =
             analysisMessages[messageIndex];
-        }, 2000); // Change message every 2 seconds
+        }, 4000); // Change message every 2 seconds
       }
 
       function stopAnalysisAnimation() {
@@ -1277,7 +1277,7 @@
         } catch (error) {
           stopAnalysisAnimation();
           showError(`Analysis failed: ${error.message}`);
-          setTimeout(() => showSection("filters"), 3000);
+          setTimeout(() => showSection("filters"), 5000);
         }
       }
 
