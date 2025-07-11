@@ -576,7 +576,7 @@
       </div>
     </div>
 
-   <script>
+    <script>
       // Global variables to store data as requested
       let initialFilters = {
         city: "",
@@ -588,11 +588,11 @@
 
       // Webhook URLs
       const INITIAL_WEBHOOK_URL =
-        "https://gelim.app.n8n.cloud/webhook/c9ab65e9-3dd2-45be-91b9-baeef2e0ab68";
+        "https://colim.app.n8n.cloud/webhook/c9ab65e9-3dd2-45be-91b9-baeef2e0ab68";
       const COMPS_WEBHOOK_URL =
-        "https://gelim.app.n8n.cloud/webhook/95f274c1-f3a4-41df-974a-65afcd724976";
+        "https://colim.app.n8n.cloud/webhook/95f274c1-f3a4-41df-974a-65afcd724976";
       const FINAL_ANALYSIS_URL =
-        "https://gelim.app.n8n.cloud/webhook/aab3031d-bd11-4f24-8b85-2b306330f934";
+        "https://colim.app.n8n.cloud/webhook/28dbe443-e9d4-47ec-9abb-6476226149c1";
 
       // Analysis messages for loading animation
       const analysisMessages = [
@@ -858,7 +858,7 @@
           messageIndex = (messageIndex + 1) % analysisMessages.length;
           document.getElementById("analysisMessage").textContent =
             analysisMessages[messageIndex];
-        }, 4000); // Change message every 2 seconds
+        }, 2000); // Change message every 2 seconds
       }
 
       function stopAnalysisAnimation() {
@@ -901,11 +901,11 @@
         const cardTitle = isSubject
           ? "🏠 Subject Property"
           : "🏘️ Comparable Property";
-        const price = property.Price || "N/A"
+        const price = property.Price || "N/A";
         const beds = property.bed || "N/A";
         const baths = property.baths || "N/A";
-        const sqft = property['Area(sqft)']
-          ? `${formatNumber(property['Area(sqft)'])} sq ft`
+        const sqft = property["Area(sqft)"]
+          ? `${formatNumber(property["Area(sqft)"])} sq ft`
           : "N/A";
         const address = property.property_address || "Address not available";
         const propertyType = property.property_type || "Address not available";
@@ -1116,17 +1116,27 @@
       }
 
       // Enhanced error handling for API calls
+      // Enhanced error handling for API calls
       async function makeAPICall(url, data, operation) {
         try {
           console.log(`Making API call for ${operation}:`, data);
+
+          const controller = new AbortController();
+          const timeout = null; // No timeout set — will wait indefinitely
+
+          // Uncomment to add optional timeout in the future
+          // const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
 
           const response = await fetch(url, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
+            signal: controller.signal,
             body: JSON.stringify(data),
           });
+
+          // clearTimeout(timeoutId); // no-op since we didn’t set timeout
 
           if (!response.ok) {
             const errorText = await response.text();
@@ -1140,7 +1150,12 @@
         } catch (error) {
           console.error(`Error in ${operation}:`, error);
 
-          if (error.name === "TypeError" && error.message.includes("fetch")) {
+          if (error.name === "AbortError") {
+            throw new Error("Request aborted due to timeout");
+          } else if (
+            error.name === "TypeError" &&
+            error.message.includes("fetch")
+          ) {
             throw new Error(
               "Network error - please check your internet connection"
             );
@@ -1277,7 +1292,7 @@
         } catch (error) {
           stopAnalysisAnimation();
           showError(`Analysis failed: ${error.message}`);
-          setTimeout(() => showSection("filters"), 5000);
+          setTimeout(() => showSection("filters"), 3000);
         }
       }
 
